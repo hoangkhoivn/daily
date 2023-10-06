@@ -139,7 +139,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 // Xử lý khi người dùng tải lên tệp tin
 router.post('/upload', upload.single('file'), (req, res) => {
-  //res.redirect('/');
+  res.redirect('/');
   //res.end("ERROR File does not exist");
  // res.send('Tệp đã được tải lên thành công.');
 });
