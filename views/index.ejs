@@ -152,17 +152,12 @@
     $('#select-mon ul li ul li').click(function (e) {
       var get_mon = e.currentTarget.textContent;
       var num_mon = get_mon.split(' ')[1];
-      var res = '<%= check_file %>';
-      alert(res.length);
-      if (path_excel_file == "" || res.length == 0) {
+      if (path_excel_file == "") {
         path_excel_file ="ok";
         $('#fileinput').focus().trigger('click');
       } else {
-        if ('<%= check_file %>' == "") {
-          $('form').submit();
-          alert('sub');
-        }
-        LoadData(num_mon);
+        $('form').submit();
+       // LoadData(num_mon);
       }
     });
     function LoadData(mon) {
@@ -179,7 +174,7 @@
       xhttp.send("get_mon=" + mon);
     }
   </script>
-  <form id="uploadForm" action="./upload" method="post" enctype="multipart/form-data" style="display: none;">
+  <form id="uploadForm" action="./upload?mon=1" method="post" enctype="multipart/form-data" style="display: none;">
     <input type="file" name="file" id="fileinput" accept=".xlsx,.xls">
     <input type="submit" value="Tải lên">
   </form>
