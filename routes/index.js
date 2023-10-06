@@ -8,9 +8,12 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 /* GET home page. */
 var data = "Express";
 var _weekday = "";
-var check_file="";
+var check_mon="";
 router.get('/', function (req, res, next) {
-  res.render('index', { data_excel: data, check_file: check_file });
+  res.render('index', { data_excel: data, check_file: "" });
+});
+router.get('/show', function (req, res, next) {
+  res.render('showdaily', { mon: check_mon});
 });
 function ProcessExcel(res,mon) {
   // Đường dẫn tới file Excel
@@ -132,14 +135,15 @@ const storage = multer.diskStorage({
     cb(null, './public/uploads'); // Thư mục 'uploads/' để lưu trữ tệp tin
   },
   filename: function (req, file, cb) {
-    check_file = "excel_file.xlsx";
     cb(null, "excel_file.xlsx"); // Giữ tên gốc của tệp tin
   },
 });
 const upload = multer({ storage: storage });
 // Xử lý khi người dùng tải lên tệp tin
 router.post('/upload', upload.single('file'), (req, res) => {
-  res.redirect('/');
+  console.log(req.query.mon);
+  check_mon=req.query.mon;
+  res.redirect('/show');
   //res.end("ERROR File does not exist");
  // res.send('Tệp đã được tải lên thành công.');
 });
