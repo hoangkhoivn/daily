@@ -8,13 +8,14 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 /* GET home page. */
 var data = "Express";
 var _weekday = "";
+var check_file="";
 router.get('/', function (req, res, next) {
-  res.render('index', { data_excel: data });
+  res.render('index', { data_excel: data, check_file: check_file });
 });
-function ProcessExcel(res,mon,path_excel_file) {
+function ProcessExcel(res,mon) {
   // Đường dẫn tới file Excel
 
-  const filePath = 'nghia-2023.xlsx';
+  const filePath = './public/uploads/excel_file.xlsx';
 
   // Đọc file Excel
   const workbook = xlsx.readFile(filePath);
@@ -121,8 +122,25 @@ function dayFromNumber(weekday) {
 }
 router.post('/', function (req, res, next) {
   console.log("Mon :" + req.body.get_mon);
-  console.log("Mon :" + req.body.get_path);
-  ProcessExcel(res,req.body.get_mo,req.body.get_path);
+  ProcessExcel(res,req.body.get_mon);
 }
 );
+const multer = require('multer'); // Middleware để xử lý tệp tin
+// Cấu hình nơi lưu trữ tệp tin tải lên
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './public/uploads'); // Thư mục 'uploads/' để lưu trữ tệp tin
+  },
+  filename: function (req, file, cb) {
+    check_file = "excel_file.xlsx";
+    cb(null, "excel_file.xlsx"); // Giữ tên gốc của tệp tin
+  },
+});
+const upload = multer({ storage: storage });
+// Xử lý khi người dùng tải lên tệp tin
+router.post('/upload', upload.single('file'), (req, res) => {
+  //res.redirect('/');
+  //res.end("ERROR File does not exist");
+ // res.send('Tệp đã được tải lên thành công.');
+});
 module.exports = router;

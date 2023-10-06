@@ -140,46 +140,46 @@
     </ul>
   </div>
   <!-- <input style="display: none;" name="upload" type="file" id="fileinput"/> -->
-  <input type="file" id="fileinput" accept=".xlsx,.xls" style="display: none;">
+  <!-- <input type="file" id="fileinput" accept=".xlsx,.xls" style="display: none;"> -->
   <ul style="transform: translateX(25%);">
     <div id="excel_data"></div>
   </ul>
   <script>
     var path_excel_file = "";
     $(document).ready(function () {
-      //LoadData(1);
+      path_excel_file = '';
     });
-
-    function choose_file() {
-
-    }
     $('#select-mon ul li ul li').click(function (e) {
       var get_mon = e.currentTarget.textContent;
       var num_mon = get_mon.split(' ')[1];
-      const fileInput = document.getElementById('fileinput');
-      path_excel_file = document.getElementById("fileinput").value
-      if (!path_excel_file) {
+
+      if (path_excel_file == "") {
+        path_excel_file = "ok";
         $('#fileinput').focus().trigger('click');
       } else {
-        alert(path_excel_file);
-        LoadData(num_mon, path_excel_file);
+        $('form').submit();
+        LoadData(num_mon);
       }
-
-      //LoadData(num_mon);
     });
-    function LoadData(mon, _path) {
+    function LoadData(mon) {
       //alert(_path);
       var xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
           $("#excel_data").html(this.response);
+          path_excel_file = "ok";
         }
       };
       xhttp.open("POST", "/", true);
       xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-      xhttp.send("get_mon=" + mon + "&get_path=" + _path);
+      xhttp.send("get_mon=" + mon);
     }
   </script>
+  <form id="uploadForm" action="./upload" method="post" enctype="multipart/form-data" style="display: none;">
+    <input type="file" name="file" id="fileinput" accept=".xlsx,.xls">
+    <input type="submit" value="Tải lên">
+  </form>
+
 </body>
 
 </html>
