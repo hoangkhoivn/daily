@@ -1,1 +1,172 @@
+<!DOCTYPE html>
+<html>
 
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <title>Hoàng Khôi PCB, Xuất data excel to website</title>
+  <style>
+    body {
+      width: 100vw;
+      padding: 0px;
+      margin: 0 auto;
+      box-sizing: border-box;
+      font-family: Arial, Courier new, Tahoma, Helvetica, sans-serif, Times New Roman;
+      font-size: small;
+      line-height: 1.2;
+      display: block;
+      background-color: white;
+      color: #2ecc71;
+    }
+
+    #select-mon>ul {
+      display: block;
+      margin-left: 10%;
+      margin-right: 10%;
+    }
+
+    #select-mon>ul>li {
+      width: 100%;
+      padding: 5px;
+      margin: 2px;
+      background-color: azure;
+    }
+
+    #select-mon>ul>li>ul {
+      display: flex;
+    }
+
+    #select-mon>ul>li>ul>li {
+      background-color: yellow;
+      width: 16%;
+      padding: 10px;
+      margin: 2px;
+      color: #000;
+      white-space: nowrap;
+    }
+
+    #select-mon>ul>li>ul>li:hover {
+      background-color: #4cd137;
+
+    }
+
+    ul {
+      list-style: none;
+      display: block;
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto;
+      padding: 0px;
+
+    }
+
+    li {
+
+      text-align: center;
+      width: 50%;
+      margin: 2px;
+      padding: 0px;
+    }
+
+    .sub-ul {
+      width: 100%;
+      display: flex;
+      text-align: center;
+      border: none;
+      align-items: center;
+      padding: 0px;
+      margin: 0 auto;
+      border: 1px solid #000;
+    }
+
+    .sub-ul li {
+      width: 50%;
+      margin: 0px;
+      padding: 0px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .sub-ul li ul {
+      margin: 1px;
+      padding: 0px;
+      display: block;
+      align-items: center;
+      text-align: left;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .sub-ul li ul li {
+      text-align: left;
+      display: block;
+      width: 95%;
+      margin: 2px;
+      padding-left: 20px;
+
+    }
+  </style>
+</head>
+
+<body>
+  <h1 style="text-align: center;">
+    Daily Job Time MVC
+  </h1>
+  <div id="select-mon">
+    <ul>
+      <li>
+        <ul>
+          <li class="mon">Tháng 1</li>
+          <li class="mon">Tháng 2</li>
+          <li class="mon">Tháng 3</li>
+          <li class="mon">Tháng 4</li>
+          <li class="mon">Tháng 5</li>
+          <li class="mon">Tháng 6</li>
+        </ul>
+      </li>
+      <li>
+        <ul>
+          <li class="mon">Tháng 7</li>
+          <li class="mon">Tháng 8</li>
+          <li class="mon">Tháng 9</li>
+          <li class="mon">Tháng 10</li>
+          <li class="mon">Tháng 11</li>
+          <li class="mon">Tháng 12</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+  <ul style="transform: translateX(25%);">
+    <div id="excel_data"></div>
+  </ul>
+  <script>
+    var path_excel_file = "";
+    $(document).ready(function () {
+      LoadData('<%= mon %>');
+    });
+    $('#select-mon ul li ul li').click(function (e) {
+      var get_mon = e.currentTarget.textContent;
+      var num_mon = get_mon.split(' ')[1];
+      LoadData(num_mon);
+    });
+    function LoadData(mon) {
+      //alert(_path);
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          $("#excel_data").html(this.response);
+         // path_excel_file = "ok";
+        }
+      };
+      xhttp.open("POST", "/", true);
+      xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      xhttp.send("get_mon=" + mon);
+    }
+  </script>
+
+</body>
+
+</html>
