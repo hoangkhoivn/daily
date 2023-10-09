@@ -161,7 +161,7 @@
       // Tạo một XMLHttpRequest object
       var xhttp = new XMLHttpRequest();
       // Thiết lập method và URL cho POST request
-      var url = "./daily/upload?mon="+num_mon;
+      var url = "./upload?mon="+num_mon;
       xhttp.open("POST", url, true);
       // Tạo một đối tượng FormData
       var formData = new FormData();
@@ -188,7 +188,7 @@
 
     }
   </script>
-  <form id="uploadForm" action="./daily/upload?mon=1" method="post" enctype="multipart/form-data"
+  <form id="uploadForm" action="./upload?mon=1" method="post" enctype="multipart/form-data"
     style="display: none;">
     <input type="file" name="file" id="fileinput" accept=".xlsx,.xls">
     <input type="submit" value="Tải lên">
