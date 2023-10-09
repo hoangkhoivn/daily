@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const fs = require('fs');
+const path = require('path');
 const xlsx = require('xlsx');
 const { format, parseISO } = require('date-fns');
 var bodyParser = require('body-parser');
@@ -10,31 +11,15 @@ var data = "Express";
 var _weekday = "";
 var check_mon="";
 router.get('/', function (req, res, next) {
-  res.render('index', { data_excel: data, check_file: "" });
+  res.render('./daily/index', { data_excel: data, check_file: "" });
 });
 router.get('/show', function (req, res, next) {
-  res.render('showdaily', { mon: check_mon});
+  res.render('./daily/showdaily', { mon: check_mon});
 });
-function ProcessExcel(res,mon) {
-  // Đường dẫn tới file Excel
-
-  const filePath = './public/uploads/excel_file.xlsx';
-
-  // Đọc file Excel
-  const workbook = xlsx.readFile(filePath);
-
-  // Lấy danh sách các sheet trong file Excel
-  const sheetNames = workbook.SheetNames;
-
-  // Lấy dữ liệu từ sheet đầu tiên
-  const firstSheetName = sheetNames[Number(mon)-1];
-  const worksheet = workbook.Sheets[firstSheetName];
-
-  // Chuyển đổi dữ liệu từ sheet thành JSON
-  const jsonData = xlsx.utils.sheet_to_json(worksheet, { header: 1 });
-  const dataArray = Object.values(jsonData);
-  var num = 0;
+function ProcessExcel(res, json_data) {
+  const dataArray =Object.values(json_data);
   const data_html = [];
+  console.log("JsonData :" + dataArray.length);
   for (i = 0; i < dataArray.length; i++) {
     var str = dataArray[i][16];
     if (str) {
@@ -99,7 +84,7 @@ function ProcessExcel(res,mon) {
       }
     }
   }
-
+  //console.log(data_html.join(' '));
   res.send(data_html.join(' '));
 }
 function date2ms(d) {
@@ -124,27 +109,32 @@ function dayFromNumber(weekday) {
   return elements[weekday];
 }
 router.post('/', function (req, res, next) {
-  console.log("Mon :" + req.body.get_mon);
-  ProcessExcel(res,req.body.get_mon);
+  console.log("Get Mon Data111");
+  ProcessExcel(res,req.body.json_data);
 }
 );
-const multer = require('multer'); // Middleware để xử lý tệp tin
-// Cấu hình nơi lưu trữ tệp tin tải lên
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './public/uploads'); // Thư mục 'uploads/' để lưu trữ tệp tin
-  },
-  filename: function (req, file, cb) {
-    cb(null, "excel_file.xlsx"); // Giữ tên gốc của tệp tin
-  },
-});
+const multer = require('multer');
+const storage = multer.memoryStorage(); // Lưu trữ tệp trong bộ nhớ
 const upload = multer({ storage: storage });
-// Xử lý khi người dùng tải lên tệp tin
-router.post('/upload', upload.single('file'), (req, res) => {
+
+// Đường dẫn để tải lên tệp Excel và xử lý
+router.post('/upload', upload.single('excelFile'), (req, res) => {
   console.log(req.query.mon);
-  check_mon=req.query.mon;
-  res.redirect('/show');
-  //res.end("ERROR File does not exist");
- // res.send('Tệp đã được tải lên thành công.');
+  if (!req.file) {
+    return res.status(400).send('No file uploaded.');
+  }
+  // Lấy dữ liệu từ tệp Excel (dữ liệu nằm trong req.file.buffer)
+  const excelData = req.file.buffer;
+// Sử dụng thư viện xlsx để đọc dữ liệu từ tệp Excel
+const workbook = xlsx.read(excelData, { type: 'buffer' });
+const sheetName = workbook.SheetNames[Number(req.query.mon)-1]; // Giả sử bạn muốn đọc từ sheet đầu tiên
+  if (!sheetName) {
+    return res.status(400).send('No sheet found in the Excel file.');
+  }
+  const sheet = workbook.Sheets[sheetName];
+  const jsonData = xlsx.utils.sheet_to_json(sheet , { header: 1 });
+  ProcessExcel(res, jsonData)
+//res.send(JSON.stringify(data_json.join(' ')));
+
 });
 module.exports = router;
