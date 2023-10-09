@@ -11,7 +11,7 @@ var data = "Express";
 var _weekday = "";
 var check_mon="";
 router.get('/', function (req, res, next) {
-  res.render('./daily/index', { data_excel: data, check_file: "" });
+  res.render('./index', { data_excel: data, check_file: "" });
 });
 router.get('/show', function (req, res, next) {
   res.render('./daily/showdaily', { mon: check_mon});
