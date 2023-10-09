@@ -145,36 +145,51 @@
     <div id="excel_data"></div>
   </ul>
   <script>
-    var path_excel_file = "";
-    $(document).ready(function () {
-      //path_excel_file = '';
-    });
+    var num_mon = "";
     $('#select-mon ul li ul li').click(function (e) {
       var get_mon = e.currentTarget.textContent;
-      var num_mon = get_mon.split(' ')[1];
-      if (path_excel_file == "") {
-        path_excel_file ="ok";
+      num_mon = get_mon.split(' ')[1];
+      var excelFileInput = document.getElementById("fileinput"); // Thay "fileInput" bằng id của input[type="file"]
+      var excelFile = excelFileInput.files[0];
+      if (!excelFile) {
         $('#fileinput').focus().trigger('click');
       } else {
-        $('form').submit();
-       // LoadData(num_mon);
+        ParseExcel(num_mon);
       }
     });
-    function LoadData(mon) {
-      //alert(_path);
+    function ParseExcel(num_mon) {
+      // Tạo một XMLHttpRequest object
       var xhttp = new XMLHttpRequest();
+      // Thiết lập method và URL cho POST request
+      var url = "./daily/upload?mon="+num_mon;
+      xhttp.open("POST", url, true);
+      // Tạo một đối tượng FormData
+      var formData = new FormData();
+      // Lấy tệp Excel từ input[type="file"] trong HTML (điều này giả định bạn có một input file trong form của bạn)
+      var excelFileInput = document.getElementById("fileinput"); // Thay "fileInput" bằng id của input[type="file"]
+      var excelFile = excelFileInput.files[0];
+      //alert("sub"+excelFile );
+      // Thêm tệp Excel vào FormData object
+      formData.append("excelFile", excelFile, excelFile.name);
+      // Xử lý sự kiện khi request hoàn thành
       xhttp.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-          $("#excel_data").html(this.response);
-         // path_excel_file = "ok";
+        if (xhttp.readyState === 4) {
+          if (xhttp.status === 200) {
+            var response = xhttp.responseText;
+            $("#excel_data").html(this.response);
+          } else {
+            console.error("Request failed with status: " + xhttp.status);
+          }
         }
       };
-      xhttp.open("POST", "/", true);
-      xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-      xhttp.send("get_mon=" + mon);
+
+      // Gửi request với FormData chứa tệp Excel
+      xhttp.send(formData);
+
     }
   </script>
-  <form id="uploadForm" action="./upload?mon=1" method="post" enctype="multipart/form-data" style="display: none;">
+  <form id="uploadForm" action="./daily/upload?mon=1" method="post" enctype="multipart/form-data"
+    style="display: none;">
     <input type="file" name="file" id="fileinput" accept=".xlsx,.xls">
     <input type="submit" value="Tải lên">
   </form>
